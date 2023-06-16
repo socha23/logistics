@@ -24,5 +24,5 @@ export function RoadMapView({road, viewState}) {
     if (theta !== 0) {
         style.transform = "rotate(" + toDegrees(theta) + "deg) "
     }
-    return <div style={style}>ROAD</div>
+    return <div style={style}/>
 } 

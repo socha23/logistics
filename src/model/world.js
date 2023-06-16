@@ -7,8 +7,7 @@ class _World {
     constructor() {
         this.cities = []
         this.citiesById = {}
-        this.roads = []
-        this.roadsById = {}
+        this.edges = []
         this.vehicles = []
         this.vehiclesById = {}
     }
@@ -20,11 +19,15 @@ class _World {
         return c
     }
 
-    addRoad(params) {
+    addEdge(params) {
         const r = new Road(params)
-        this.roads.push(r)
-        this.roadsById[r.id] = r
+        this.edges.push(r)
         return r
+    }
+
+    addConnection(nodeA, nodeB) {
+        this.addEdge({from: nodeA, to: nodeB})
+        this.addEdge({from: nodeB, to: nodeA})
     }
 
     addVehicle(params) {
@@ -37,7 +40,7 @@ class _World {
     toView() {
         return {
             cities: this.cities.map(c => c.toView()),
-            roads: this.roads.map(r => r.toView()),
+            roads: this.edges.map(r => r.toView()),
             vehicles: this.vehicles.map(v => v.toView())
         }
     }
@@ -48,9 +51,8 @@ class _World {
 
 
     findEdgeBetween(from, to) {
-        return this.roads.find(e =>
+        return this.edges.find(e =>
             (e.from === from && e.to === to)
-            || (e.from === to && e.to === from)            
             ) || null
     }
 
@@ -58,11 +60,23 @@ class _World {
 
 const WORLD = new _World()
 
-const c1 = WORLD.addCity({name: "C1", position: {x: 200, y: 50}})
-const c2 = WORLD.addCity({name: "C2", position: {x: 500, y: 200}})
+const a1 = WORLD.addCity({name: "A1", position: {x: 200, y: 50}})
+const a2 = WORLD.addCity({name: "A2", position: {x: 200, y: 250}})
 
-const r1 = WORLD.addRoad({from: c1, to: c2})
+const b1 = WORLD.addCity({name: "B1", position: {x: 300, y: 150}})
+WORLD.addConnection(a1, b1)
+WORLD.addConnection(a2, b1)
 
-WORLD.addVehicle({name: "V1", maxSpeed: 20, road: r1})
+const c1 = WORLD.addCity({name: "C1", position: {x: 400, y: 150}})
+WORLD.addConnection(b1, c1)
+
+const d1 = WORLD.addCity({name: "D1", position: {x: 500, y: 50}})
+WORLD.addConnection(c1, d1)
+
+const d2 = WORLD.addCity({name: "D2", position: {x: 500, y: 250}})
+WORLD.addConnection(c1, d2)
+
+
+WORLD.addVehicle({name: "V1", maxSpeed: 20, startingNode: a1})
 
 export default WORLD

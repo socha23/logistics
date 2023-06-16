@@ -7,41 +7,14 @@ const DEFAULT_VEHICLE_PARAMS = {
 
 
 class ActionFollowEdge {
-    constructor(edge, direction) {
-        this.edge = edge
-        this.direction = direction
-    }
-
     updateState(deltaMs, vehicle) {
-        vehicle.moveAlongEdge(deltaMs, this.edge, this.direction)    
+        vehicle._followEdge(deltaMs)    
     }
 
     isComplete(vehicle) {
-        return vehicle.location instanceof LocationInNode
-
+        return vehicle._currentNode != null
     }
 } 
-
-class LocationAlongEdge {
-    constructor(edge, distance) {
-        this.edge = edge
-        this.distance = distance
-    }
-
-    get position() {
-        return this.edge.pointAlong(this.distance)
-    }
- }
-
- class LocationInNode {
-    constructor(node) {
-        this.node = node
-    }
-
-    get position() {
-        return this.node.position
-    }
- }
 
 export default class Vehicle {
 
@@ -55,65 +28,61 @@ export default class Vehicle {
         this.name = params.name
         this._maxSpeed = params.maxSpeed
         
-        const edge = params.road
-        this.location = new LocationInNode(edge.from)
-        this.commandFollowEdge(edge, 1)
+        this._currentNode = params.startingNode
+        this._currentEdge = null
+        this._currentEdgeDistance = 0
     }
 
-    commandFollowEdge(edge, direction) {
-        this._setLocationOnEdge(edge)
-        this._action = new ActionFollowEdge(edge, direction)
-    }
-
-    currentNode() {
-        if (this.location instanceof LocationInNode) {
-            return this.location.node
+    commandFollowEdge(edge) {
+        if (this._currentEdge === edge) {
+            // already following, do nothing
+        } else if (this._currentEdge != null 
+            && this._currentEdge.from === edge.to 
+            && this._currentEdge.to === edge.from) {
+            // already following opposite edge, reverse
+            const newEdgeDistance = this._currentEdge.length - this._currentEdgeDistance
+            this._currentEdgeDistance = newEdgeDistance
+            this._currentEdge = edge
+        } else if (this._currentNode != null && this._currentNode === edge.from) {
+            // start along edge
+            this._currentNode = null
+            this._currentEdge = edge
+            this._currentEdgeDistance = 0
         } else {
-            return null
+            // this is some error state?
+            throw new Error("Can't follow edge")
         }
+        this._action = new ActionFollowEdge()
     }
 
-    currentEdge() {
-        if (this.location instanceof LocationAlongEdge) {
-            return this.location.edge
-        } else {
-            return null
-        }
+    get currentNode() {
+        return this._currentNode
     }
 
-    _setLocationOnEdge(edge) {
-        // either we're on start of the edge...
-        if (this.currentNode() === edge.from) {
-            this.location = new LocationAlongEdge(edge, 0)
-        } 
-        // or at the end...        
-        else if (this.currentNode() === edge.to) {
-            this.location = new LocationAlongEdge(edge, edge.length)
-        } 
-        // or we're on the edge already
-        else if (this.currentEdge() === edge) {
-            // no need to do anything
-        }
-        // or we in some error state
-        else {
-            throw new Error("Can't set location on edge")
-        }
+    get currentEdge() {
+        return this._currentEdge
     }
 
-    moveAlongEdge(deltaMs, edge, direction) {
-        this.location.distance = Math.max(0, Math.min(edge.length,
-            this.location.distance + this.speed * deltaMs * 0.01 * direction
+    _followEdge(deltaMs) {
+        this._currentEdgeDistance = Math.max(0, Math.min(this._currentEdge.length,
+            this._currentEdgeDistance + this.speed * deltaMs * 0.01
         ))
-        if (direction < 0 && this.location.distance === 0) {
-            this.location = new LocationInNode(edge.from)
-            
-        } else if (direction > 0 && this.location.distance === edge.length) {
-            this.location = new LocationInNode(edge.to)
+        if (this._currentEdgeDistance === this._currentEdge.length) {
+            // arrived at dest
+            this._currentNode = this._currentEdge.to
+            this._currentEdge = null
+            this._currentEdgeDistance = 0
         }
     }
 
     get position() {
-        return this.location.position
+        if (this._currentNode) {
+            return this._currentNode.position
+        } else if (this._currentEdge) {
+            return this._currentEdge.pointAlong(this._currentEdgeDistance)
+        } else {
+            throw new Error("Can't determine position")
+        }
     }
 
     get speed() {
@@ -124,14 +93,9 @@ export default class Vehicle {
         if (this._action != null) {
             this._action.updateState(deltaMs, this)
             if (this._action.isComplete(this)) {                
-                this.onActionComplete(this._action)
                 this._action = null
             }    
         }
-    }
-
-    onActionComplete(action) {
-        console.log("Action complete", action)
     }
 
     toView() {
