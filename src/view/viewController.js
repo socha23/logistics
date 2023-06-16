@@ -42,7 +42,7 @@ class ViewController {
     apply(world, orderExecutor) {
         if (this._focusState === FOCUS_VEHICLE && this._rightState === RIGHT_CITY) {
             const vehicle = world.vehiclesById[this.focusedObjectId]
-            const node = world.citiesById[this.rightClickedId]
+            const node = world.nodesById[this.rightClickedId]
             
             orderExecutor.onMoveToNode(vehicle, node)
         }

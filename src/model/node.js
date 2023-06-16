@@ -1,18 +1,18 @@
 import { Point } from "../util/geometry"
 
-var __city_autoinc = 0
+var __node_autoinc = 0
 
-const DEFAULT_CITY_PARAMS = {
-    name: "Unnamed city",
+const DEFAULT_NODE_PARAMS = {
+    name: "Unnamed node",
     position: {x: 0, y: 0}
 }
 
-export default class City {
+export default class Node {
 
     constructor(params) {
-        this.id = "city#" + (__city_autoinc++)
+        this.id = "node#" + (__node_autoinc++)
         params = {
-            ...DEFAULT_CITY_PARAMS, 
+            ...DEFAULT_NODE_PARAMS, 
             name: this.id, 
             ...params}
         this._position = new Point(params.position.x, params.position.y)

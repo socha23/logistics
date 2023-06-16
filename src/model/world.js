@@ -1,26 +1,26 @@
-import City from "./city"
-import Road from "./road"
+import Node from "./node"
+import Edge from "./edge"
 import Vehicle from "./vehicle"
 
 
 class _World {
     constructor() {
-        this.cities = []
-        this.citiesById = {}
+        this.nodes = []
+        this.nodesById = {}
         this.edges = []
         this.vehicles = []
         this.vehiclesById = {}
     }
 
     addCity(params) {
-        const c = new City(params)
-        this.cities.push(c)
-        this.citiesById[c.id] = c
+        const c = new Node(params)
+        this.nodes.push(c)
+        this.nodesById[c.id] = c
         return c
     }
 
     addEdge(params) {
-        const r = new Road(params)
+        const r = new Edge(params)
         this.edges.push(r)
         return r
     }
@@ -39,7 +39,7 @@ class _World {
 
     toView() {
         return {
-            cities: this.cities.map(c => c.toView()),
+            cities: this.nodes.map(c => c.toView()),
             roads: this.edges.map(r => r.toView()),
             vehicles: this.vehicles.map(v => v.toView())
         }

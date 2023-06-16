@@ -1,9 +1,9 @@
-var __road_autoinc = 0
+var __edge_autoinc = 0
 
-export default class Road {
+export default class Edge {
 
     constructor(params) {
-        this.id = "road#" + (__road_autoinc++)
+        this.id = "edge#" + (__edge_autoinc++)
         
         this.from = params.from     
         this.to = params.to
