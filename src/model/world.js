@@ -1,7 +1,7 @@
 import Node from "./node"
 import Edge from "./edge"
 import Vehicle from "./vehicle"
-
+import generateWorld from './world_gen'
 
 class _World {
     constructor() {
@@ -22,6 +22,7 @@ class _World {
     addEdge(params) {
         const r = new Edge(params)
         this.edges.push(r)
+        params.from.addOutgoingEdge(r)
         return r
     }
 
@@ -40,7 +41,7 @@ class _World {
     toView() {
         return {
             cities: this.nodes.map(c => c.toView()),
-            roads: this.edges.map(r => r.toView()),
+            edges: this.edges.map(r => r.toView()),
             vehicles: this.vehicles.map(v => v.toView())
         }
     }
@@ -56,27 +57,76 @@ class _World {
             ) || null
     }
 
+    findPathBetween(from, to) {
+        // dijkstra's algorithm
+        const dist = {}
+        const prev = {}
+        const unvisited = new Set()
+
+        this.nodes.forEach(n => {
+            dist[n.id] = Infinity
+            unvisited.add(n)
+        })
+        dist[from.id] = 0
+
+        while (true) {
+            // u = find start node
+            var curDist = Infinity
+            var u = null
+            for (const n of unvisited) {
+                if (dist[n.id] < curDist) {
+                    curDist = dist[n.id]
+                    u = n
+                }
+            }
+            if (u === to) {
+                break
+            }
+            if (u === null) {
+                throw new Error("dijkstra")
+            }
+
+            unvisited.delete(u)
+            for (var eIdx = 0; eIdx < u.outgoingEdges.length; eIdx++) {
+                const edge = u.outgoingEdges[eIdx]
+                const v = edge.to
+                if (unvisited.has(v)) {
+                    const alt = dist[u.id] + edge.length
+                    if (alt < dist[v.id]) {
+                        dist[v.id] = alt
+                        prev[v.id] = u
+                    }
+                }
+            }
+        }
+
+        if (!prev[to.id]) {
+            throw new Error("No path found")
+        }
+
+        const path = []
+        var u2 = to
+        while (u2 !== from) {
+            path.push(u2)
+            u2 = prev[u2.id]
+        }
+
+        path.reverse()
+
+        const result = []
+        var a = from
+        path.forEach(b => {
+            result.push(this.findEdgeBetween(a, b))
+            a = b
+        })
+
+        return result
+        
+    }
+
 }
 
 const WORLD = new _World()
-
-const a1 = WORLD.addCity({name: "A1", position: {x: 200, y: 50}})
-const a2 = WORLD.addCity({name: "A2", position: {x: 200, y: 250}})
-
-const b1 = WORLD.addCity({name: "B1", position: {x: 300, y: 150}})
-WORLD.addConnection(a1, b1)
-WORLD.addConnection(a2, b1)
-
-const c1 = WORLD.addCity({name: "C1", position: {x: 400, y: 150}})
-WORLD.addConnection(b1, c1)
-
-const d1 = WORLD.addCity({name: "D1", position: {x: 500, y: 50}})
-WORLD.addConnection(c1, d1)
-
-const d2 = WORLD.addCity({name: "D2", position: {x: 500, y: 250}})
-WORLD.addConnection(c1, d2)
-
-
-WORLD.addVehicle({name: "V1", maxSpeed: 20, startingNode: a1})
+generateWorld(WORLD)
 
 export default WORLD

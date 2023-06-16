@@ -5,7 +5,7 @@ import { VehicleMapView } from "./vehicleView"
 import VIEW_CONTROLLER from "./viewController"
 
 const MAP_WIDTH = 1000
-const MAP_HEIGHT = 400
+const MAP_HEIGHT = 700
 
 
 const MapObject = ({x, y, children}) => <div style={{
@@ -24,8 +24,8 @@ const MapView = ({world, viewState}) => <div style={{
     onContextMenu={e => {VIEW_CONTROLLER.onRightClickMap(); e.preventDefault()}}
 >
 {
-        world.roads.map(c => 
-            <MapObject key={c.id} x={c.x} y={c.y}>
+        world.edges.map(c => 
+            <MapObject key={c.id} x={c.fromX} y={c.fromY}>
                 <RoadMapView road={c} viewState={viewState}/>
             </MapObject>
         )

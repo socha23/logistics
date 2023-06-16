@@ -4,7 +4,8 @@ import { toDegrees } from "../util/geometry"
 
 export function RoadMapView({road, viewState}) {
 
-    let width=1
+    let ROAD_WIDTH=10
+    const MARGIN_BETWEEN_ROADS = 4
 
     const from = new Point(road.fromX, road.fromY)
     const to = new Point(road.toX, road.toY)
@@ -13,16 +14,23 @@ export function RoadMapView({road, viewState}) {
     const theta = vect.theta
     const style = {
         position: "absolute",
-        left: from.x - width / 2,
-        top: from.y,
-
-        width: (vect.length + width) || 0,
-        height: width,
-        backgroundColor: "black",
-        transformOrigin: (width / 2) + "px 50%",
+        //height: ROAD_WIDTH + MARGIN_BETWEEN_ROADS,
+        height: ROAD_WIDTH,
+        top: -ROAD_WIDTH/2,
+        transformOrigin: "0 50%",
     }
     if (theta !== 0) {
         style.transform = "rotate(" + toDegrees(theta) + "deg) "
     }
-    return <div style={style}/>
+    return <div style={style}>
+        <div style={{
+            width: vect.length,
+            //top: -ROAD_WIDTH - MARGIN_BETWEEN_ROADS,
+            height: ROAD_WIDTH,
+            border: "1px solid black",
+            position: "absolute",
+            marginBottom: MARGIN_BETWEEN_ROADS,
+        }}>
+        </div>
+    </div>
 } 

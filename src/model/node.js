@@ -17,6 +17,12 @@ export default class Node {
             ...params}
         this._position = new Point(params.position.x, params.position.y)
         this._name = params.name
+
+        this.outgoingEdges = []
+    }
+
+    addOutgoingEdge(e) {
+        this.outgoingEdges.push(e)
     }
 
     get position() {

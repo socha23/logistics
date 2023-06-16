@@ -1,3 +1,5 @@
+import WORLD from "./world"
+
 var __vehicle_autoinc = 0
 
 const DEFAULT_VEHICLE_PARAMS = {
@@ -7,14 +9,56 @@ const DEFAULT_VEHICLE_PARAMS = {
 
 
 class ActionFollowEdge {
-    updateState(deltaMs, vehicle) {
-        vehicle._followEdge(deltaMs)    
+
+    constructor(vehicle, edge) {
+        this.vehicle = vehicle
+        this.edge = edge
     }
 
-    isComplete(vehicle) {
-        return vehicle._currentNode != null
+    onEnter() {
+        this.vehicle._enterEdge(this.edge)
+    }
+
+    updateState(deltaMs) {
+        this.vehicle._followCurrentEdge(deltaMs)    
+    }
+
+    isComplete() {
+        return this.vehicle._currentEdge !== this.edge
     }
 } 
+
+class VehicleExecutor {
+    constructor() {
+        this.currentAction = null
+        this.actions = []
+    }
+
+    enqueue(action) {
+        this.actions.push(action)
+    }
+
+    cancelCurrentActions() {
+        this.currentAction = null
+        this.actions = []
+    }
+
+    updateState(deltaMs) {
+        if (this.currentAction && this.currentAction.isComplete()) {
+            this.currentAction = null
+            this.actions.splice(0, 1)
+        }
+
+        if (this.currentAction === null && this.actions.length > 0) {
+            this.currentAction = this.actions[0]
+            this.currentAction.onEnter()
+        }
+
+        if (this.currentAction) {
+            this.currentAction.updateState(deltaMs)
+        }
+    }
+}
 
 export default class Vehicle {
 
@@ -31,28 +75,24 @@ export default class Vehicle {
         this._currentNode = params.startingNode
         this._currentEdge = null
         this._currentEdgeDistance = 0
+
+        this._executor = new VehicleExecutor(this)
     }
 
-    commandFollowEdge(edge) {
-        if (this._currentEdge === edge) {
-            // already following, do nothing
-        } else if (this._currentEdge != null 
-            && this._currentEdge.from === edge.to 
-            && this._currentEdge.to === edge.from) {
-            // already following opposite edge, reverse
-            const newEdgeDistance = this._currentEdge.length - this._currentEdgeDistance
-            this._currentEdgeDistance = newEdgeDistance
-            this._currentEdge = edge
-        } else if (this._currentNode != null && this._currentNode === edge.from) {
-            // start along edge
-            this._currentNode = null
-            this._currentEdge = edge
-            this._currentEdgeDistance = 0
-        } else {
-            // this is some error state?
-            throw new Error("Can't follow edge")
+    commandMoveToNode(node) {
+        var nodeFrom = this._currentNode || this._currentEdge.to      
+        
+        const path = []
+        if (this._currentEdge) {
+            path.push(this._currentEdge)
         }
-        this._action = new ActionFollowEdge()
+        const newPath = WORLD.findPathBetween(nodeFrom, node)
+        path.push(...newPath)
+
+        this._executor.cancelCurrentActions()
+        path.forEach(e => {
+            this._executor.enqueue(new ActionFollowEdge(this, e))
+        })
     }
 
     get currentNode() {
@@ -63,7 +103,21 @@ export default class Vehicle {
         return this._currentEdge
     }
 
-    _followEdge(deltaMs) {
+    _enterEdge(edge) {
+        if (this._currentEdge === edge) {
+            // already following, do nothing
+        } else if (this._currentNode != null && this._currentNode === edge.from) {
+            // start along edge
+            this._currentNode = null
+            this._currentEdge = edge
+            this._currentEdgeDistance = 0
+        } else {
+            // this is some error state?
+            throw new Error("Can't enter edge")
+        }
+    }
+
+    _followCurrentEdge(deltaMs) {
         this._currentEdgeDistance = Math.max(0, Math.min(this._currentEdge.length,
             this._currentEdgeDistance + this.speed * deltaMs * 0.01
         ))
@@ -90,12 +144,7 @@ export default class Vehicle {
     }
 
     updateState(deltaMs) {
-        if (this._action != null) {
-            this._action.updateState(deltaMs, this)
-            if (this._action.isComplete(this)) {                
-                this._action = null
-            }    
-        }
+        this._executor.updateState(deltaMs)
     }
 
     toView() {
