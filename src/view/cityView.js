@@ -13,6 +13,8 @@ export const CityMapView = ({city, viewState}) => <div>
         height: MAP_STYLES.CITY.size,
     }}
         onClick={() => VIEW_CONTROLLER.onClickCity(city.id)}
+        onMouseOver={() => VIEW_CONTROLLER.onMouseOverCity(city.id)}
+        onMouseOut={() => VIEW_CONTROLLER.onMouseOutCity(city.id)}
         onContextMenu={e => {VIEW_CONTROLLER.onRightClickCity(city.id); e.stopPropagation(); e.preventDefault(); return false}}
     >
     </div>

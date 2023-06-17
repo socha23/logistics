@@ -4,15 +4,16 @@ const FOCUS_VEHICLE = 2;
 
 const RIGHT_NONE = 0;
 const RIGHT_CITY = 1;
-const RIGHT_VEHICLE = 2;
-
 
 class ViewController {
     constructor() {
         this.focusedObjectId = ""
-        this.rightClickedId = ""
         this._focusState = FOCUS_NONE
+                
+        this.rightClickedId = ""
         this._rightState = RIGHT_NONE
+
+        this.hoverId = ""
     }
 
     onClickCity(cityId) {
@@ -28,6 +29,27 @@ class ViewController {
     onRightClickCity(cityId) {
         this.rightClickedId = cityId
         this._rightState = RIGHT_CITY
+    }
+
+    onMouseOverCity(cityId) {
+        this.hoverId = cityId
+    }
+
+    onMouseOutCity(cityId) {
+        if (this.hoverId === cityId) {
+            this.hoverId = ""
+        }
+    }
+
+    onMouseOverVehicle(vehicleId) {
+        this.hoverId = vehicleId
+    } 
+
+    onMouseOutVehicle(vehicleId) {
+        if (this.hoverId === vehicleId) {
+            this.hoverId = ""
+        }
+
     }
 
     onRightClickMap() {
@@ -50,12 +72,10 @@ class ViewController {
         this.rightClickedId = ""
     }
 
-
-
-
     toView() {
         return {
-            focusedObjectId: this.focusedObjectId
+            focusedObjectId: this.focusedObjectId,
+            hoverObjectId: this.hoverId,
         }
     }
 }

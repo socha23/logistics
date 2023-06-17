@@ -19,6 +19,8 @@ export const VehicleMapView = ({vehicle, viewState}) => <div style={{
 
     }}
         onClick={() => VIEW_CONTROLLER.onClickVehicle(vehicle.id)}
+        onMouseOver={() => VIEW_CONTROLLER.onMouseOverVehicle(vehicle.id)}
+        onMouseOut={() => VIEW_CONTROLLER.onMouseOutVehicle(vehicle.id)}
     >
     </div>
 
@@ -31,7 +33,6 @@ export const VehicleMapView = ({vehicle, viewState}) => <div style={{
         height: MAP_STYLES.VEHICLE.size ,
         zIndex: 0,
         borderRadius: MAP_STYLES.VEHICLE.size,
-
     }}
     >
     </div>
