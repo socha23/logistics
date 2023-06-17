@@ -1,8 +1,8 @@
 import React from "react"
 
 import VIEW_CONTROLLER from "./viewController"
+import { MAP_STYLES } from "./styles";
 
-const VEHICLE_ICON_SIZE = 20
 const CLICK_OVERLAY_SIZE = 40
 
 export const VehicleMapView = ({vehicle, viewState}) => <div style={{
@@ -23,14 +23,14 @@ export const VehicleMapView = ({vehicle, viewState}) => <div style={{
     </div>
 
     <div style={{
+        ...MAP_STYLES.VEHICLE,
         position: "absolute",
-        left: -VEHICLE_ICON_SIZE/2,
-        top: -VEHICLE_ICON_SIZE/2,
-        width: VEHICLE_ICON_SIZE,
-        height: VEHICLE_ICON_SIZE,
+        left: -MAP_STYLES.VEHICLE.size /2,
+        top: -MAP_STYLES.VEHICLE.size /2,
+        width: MAP_STYLES.VEHICLE.size ,
+        height: MAP_STYLES.VEHICLE.size ,
         zIndex: 0,
-        backgroundColor: (viewState.focusedObjectId === vehicle.id ? "red" : "#000"),
-        borderRadius: VEHICLE_ICON_SIZE,
+        borderRadius: MAP_STYLES.VEHICLE.size,
 
     }}
     >

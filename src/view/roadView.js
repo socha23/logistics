@@ -2,34 +2,31 @@ import React from "react"
 import { Point } from "../util/geometry"
 import { toDegrees } from "../util/geometry"
 
+import { MAP_STYLES } from "./styles"
+
 export function RoadMapView({road, viewState}) {
 
-    let ROAD_WIDTH=10
-    const MARGIN_BETWEEN_ROADS = 4
-
-    const from = new Point(road.fromX, road.fromY)
-    const to = new Point(road.toX, road.toY)
-
-    const vect = from.vectorTo(to)
+    const vect = new Point(road.fromX, road.fromY)
+        .vectorTo(new Point(road.toX, road.toY))
     const theta = vect.theta
+
     const style = {
+        top: Math.cos(theta) * MAP_STYLES.ROAD.laneDistance / 2,
+        left: -Math.sin(theta) * MAP_STYLES.ROAD.laneDistance / 2,
         position: "absolute",
-        //height: ROAD_WIDTH + MARGIN_BETWEEN_ROADS,
-        height: ROAD_WIDTH,
-        top: -ROAD_WIDTH/2,
-        transformOrigin: "0 50%",
+        transformOrigin: "0 0",
     }
     if (theta !== 0) {
         style.transform = "rotate(" + toDegrees(theta) + "deg) "
     }
+
     return <div style={style}>
         <div style={{
-            width: vect.length,
-            //top: -ROAD_WIDTH - MARGIN_BETWEEN_ROADS,
-            height: ROAD_WIDTH,
-            border: "1px solid black",
+            ...MAP_STYLES.ROAD,
             position: "absolute",
-            marginBottom: MARGIN_BETWEEN_ROADS,
+            width: vect.length,
+            height: MAP_STYLES.ROAD.size, 
+            top: -MAP_STYLES.ROAD.size / 2,
         }}>
         </div>
     </div>

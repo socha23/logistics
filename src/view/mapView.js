@@ -2,6 +2,8 @@ import React from "react"
 import { CityMapView } from "./cityView"
 import { RoadMapView } from "./roadView"
 import { VehicleMapView } from "./vehicleView"
+import { FocusRing } from "./mapOverlays"
+
 import VIEW_CONTROLLER from "./viewController"
 
 const MAP_WIDTH = 1000
@@ -33,6 +35,7 @@ const MapView = ({world, viewState}) => <div style={{
     {
         world.cities.map(c => 
             <MapObject key={c.id} x={c.x} y={c.y}>
+                <FocusRing objectId={c.id} viewState={viewState}/>
                 <CityMapView city={c} viewState={viewState}/>
             </MapObject>
         )
@@ -40,6 +43,7 @@ const MapView = ({world, viewState}) => <div style={{
     {
         world.vehicles.map(c => 
             <MapObject key={c.id} x={c.x} y={c.y}>
+                <FocusRing objectId={c.id} viewState={viewState}/>
                 <VehicleMapView vehicle={c} viewState={viewState}/>
             </MapObject>
         )
