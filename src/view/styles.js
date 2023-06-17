@@ -2,12 +2,21 @@ export const COLORS = {
     DEFAULT: "#888",
     VEHICLE: "#444",
     ROAD: "#ccc",
+    FOCUS: "red",
+    HOVER: "red",
 }
 
 
-
-
 export const MAP_STYLES = {}
+
+MAP_STYLES.FOCUS_CONTAINER = {
+    opacity: 0.7,
+}
+
+MAP_STYLES.HOVER_CONTAINER = {
+    opacity: 0.3,
+}
+
 
 MAP_STYLES.CITY = {
         border: "3px solid " + COLORS.DEFAULT,
@@ -31,14 +40,26 @@ MAP_STYLES.FOCUS_RING = {
         borderStyle: "dashed",
         borderRadius: 50,
         size: 50,
-        color: "red",
+        color: COLORS.FOCUS,
         animationName: "spin",
         animationDuration: "5s",
         animationTimingFunction: "linear",
         animationIterationCount: "infinite",
-        opacity: 0.7,
 }
 MAP_STYLES.HOVER_RING = {
         ...MAP_STYLES.FOCUS_RING,
-        opacity: 0.3,
+        color: COLORS.HOVER,
+}
+
+
+MAP_STYLES.FOCUS_PATH = {
+    size: 5,
+    backgroundColor: COLORS.FOCUS,
+    border: "none",
+}
+
+MAP_STYLES.HOVER_PATH = {
+    size: 5,
+    backgroundColor: COLORS.HOVER,
+    border: "none",
 }

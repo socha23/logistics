@@ -101,6 +101,7 @@ class _World {
         }
 
         if (!prev[to.id]) {
+            console.log("No path found", from, to)
             throw new Error("No path found")
         }
 

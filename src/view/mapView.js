@@ -2,7 +2,7 @@ import React from "react"
 import { CityMapView } from "./cityView"
 import { RoadMapView } from "./roadView"
 import { VehicleMapView } from "./vehicleView"
-import { FocusRing, HoverRing } from "./mapOverlays"
+import { FocusPath, FocusRing, HoverPath, HoverRing } from "./mapOverlays"
 
 import VIEW_CONTROLLER from "./viewController"
 
@@ -21,6 +21,7 @@ const MapObject = ({x, y, children}) => <div style={{
 const MapView = ({world, viewState}) => <div style={{
     width: MAP_WIDTH,
     height: MAP_HEIGHT,
+    position: "relative",
     border: "1px solid black",
 }}
     onContextMenu={e => {VIEW_CONTROLLER.onRightClickMap(); e.preventDefault()}}
@@ -50,6 +51,8 @@ const MapView = ({world, viewState}) => <div style={{
             </MapObject>
         )
     }
+    <HoverPath path={viewState.hoverPath}/>
+    <FocusPath path={viewState.focusedPath}/>
 </div>
 
 

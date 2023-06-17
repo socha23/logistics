@@ -1,3 +1,5 @@
+import WORLD from "../model/world";
+
 const FOCUS_NONE = 0;
 const FOCUS_CITY = 1;
 const FOCUS_VEHICLE = 2;
@@ -14,6 +16,7 @@ class ViewController {
         this._rightState = RIGHT_NONE
 
         this.hoverId = ""
+        this.hoverPath = null
     }
 
     onClickCity(cityId) {
@@ -38,6 +41,7 @@ class ViewController {
     onMouseOutCity(cityId) {
         if (this.hoverId === cityId) {
             this.hoverId = ""
+            this.hoverPath = null
         }
     }
 
@@ -61,21 +65,43 @@ class ViewController {
         return this.focusedObjectId === object.id
     }
 
-    apply(world, orderExecutor) {
-        if (this._focusState === FOCUS_VEHICLE && this._rightState === RIGHT_CITY) {
-            const vehicle = world.vehiclesById[this.focusedObjectId]
-            const node = world.nodesById[this.rightClickedId]
-            
-            orderExecutor.onMoveToNode(vehicle, node)
+    apply(orderExecutor) {
+        const focusedVehicle = WORLD.vehiclesById[this.focusedObjectId]
+        const rightClickedCity = WORLD.nodesById[this.rightClickedId]
+        const hoverCity = WORLD.nodesById[this.hoverId]
+
+
+        if (focusedVehicle && rightClickedCity) {
+            orderExecutor.onMoveToNode(focusedVehicle, rightClickedCity)
         }
         this._rightState = RIGHT_NONE
         this.rightClickedId = ""
+
+        if (focusedVehicle && hoverCity) {
+                const nodeFrom = focusedVehicle.currentNode ? focusedVehicle.currentNode : focusedVehicle.currentEdge.to
+                if (hoverCity !== nodeFrom) {
+                    const path = WORLD.findPathBetween(nodeFrom, hoverCity)
+                    if (path) {
+                        // hover path found
+                        this.hoverPath = [focusedVehicle.position, nodeFrom.position, ...path.map(e => e.to.position)]
+                    }    
+                }                
+        }
     }
 
     toView() {
+        const focusedPath = []
+        const focusedVehicle = WORLD.vehiclesById[this.focusedObjectId]
+        if (focusedVehicle) {
+            focusedPath.push(focusedVehicle.position)
+            focusedPath.push(...focusedVehicle.waypointPositions)
+        }
+
         return {
             focusedObjectId: this.focusedObjectId,
+            focusedPath: focusedPath,
             hoverObjectId: this.hoverId,
+            hoverPath: this.hoverPath || [],
         }
     }
 }

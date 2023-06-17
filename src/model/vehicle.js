@@ -26,6 +26,10 @@ class ActionFollowEdge {
     isComplete() {
         return this.vehicle._currentEdge !== this.edge
     }
+
+    get waypointPosition() {
+        return this.edge.to.position
+    }
 } 
 
 class VehicleExecutor {
@@ -137,6 +141,10 @@ export default class Vehicle {
         } else {
             throw new Error("Can't determine position")
         }
+    }
+
+    get waypointPositions() {
+        return this._executor.actions.map(a => a.waypointPosition)
     }
 
     get speed() {

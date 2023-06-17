@@ -21,7 +21,7 @@ class Game {
       var time = window.performance.now()
       var delta = time - this.lastStateUpate
       if (delta > 0) {
-        this.viewController.apply(this.world, this.orderExecutor)
+        this.viewController.apply(this.orderExecutor)
         this.world.updateState(delta)
         this.lastStateUpate = time
       }
