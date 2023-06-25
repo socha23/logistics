@@ -52,14 +52,25 @@ MAP_STYLES.HOVER_RING = {
 }
 
 
-MAP_STYLES.FOCUS_PATH = {
+MAP_STYLES.FOCUS_PATH_EDGE = {
     size: 5,
     backgroundColor: COLORS.FOCUS,
     border: "none",
 }
 
-MAP_STYLES.HOVER_PATH = {
-    size: 5,
+MAP_STYLES.FOCUS_PATH_NODE = {
+    size: 12,
+    backgroundColor: COLORS.FOCUS,
+    borderRadius: 12,
+}
+
+
+MAP_STYLES.HOVER_PATH_EDGE = {
+    ...MAP_STYLES.FOCUS_PATH_EDGE,
     backgroundColor: COLORS.HOVER,
-    border: "none",
+}
+
+MAP_STYLES.HOVER_PATH_NODE = {
+    ...MAP_STYLES.FOCUS_PATH_NODE,
+    backgroundColor: COLORS.HOVER,
 }

@@ -22,7 +22,6 @@ export const HoverRing = ({objectId, viewState}) =>
     <Ring style={{...MAP_STYLES.HOVER_CONTAINER, ...MAP_STYLES.HOVER_RING}} active={viewState.hoverObjectId === objectId && viewState.focusedObjectId !== objectId}/>
 
 function PathSegment({from, to, style}) {
-    
     const vect = from.vectorTo(to)
     return <div style={{
         // translation
@@ -45,18 +44,50 @@ function PathSegment({from, to, style}) {
             </div>            
         </div>
     </div>
-
 }
 
-function Path({path, containerStyle, style}) {
+function PathNode({position, style}) {
+    return <div style={{
+        // translation
+        position: "absolute",
+        top: position.y,
+        left: position.x,
+    }}>
+        <div style={{
+            ...style,
+            position: "absolute",
+            width: style.size,
+            height: style.size, 
+            top: -style.size / 2,
+            left: -style.size / 2,
+        }}>
+        </div>            
+    </div>
+}
+
+
+function Path({path, containerStyle, edgeStyle, nodeStyle}) {
     const edges = []
     for (var i = 0; i < path.length - 1; i++) {
         edges.push([path[i], path[i + 1]])
     }
     return <div style={containerStyle}>
-        {edges.map(e => <PathSegment key={"path" + e[1].x + e[1].y} from={e[0]} to={e[1]} style={style}/>)}
+        {edges.map(e => 
+            <div key={"path" + e[1].x + e[1].y}>
+                <PathSegment from={e[0]} to={e[1]} style={edgeStyle}/>
+                <PathNode position={e[1]} style={nodeStyle}/>
+            </div>)
+        }
     </div>
 }
 
-export const FocusPath = ({path}) => <Path path={path} containerStyle={MAP_STYLES.FOCUS_CONTAINER} style={MAP_STYLES.FOCUS_PATH}/>
-export const HoverPath = ({path}) => <Path path={path} containerStyle={MAP_STYLES.HOVER_CONTAINER} style={MAP_STYLES.HOVER_PATH}/>
+export const FocusPath = ({path}) => <Path path={path} 
+    containerStyle={MAP_STYLES.FOCUS_CONTAINER} 
+    edgeStyle={MAP_STYLES.FOCUS_PATH_EDGE}
+    nodeStyle={MAP_STYLES.FOCUS_PATH_NODE}
+    />
+export const HoverPath = ({path}) => <Path path={path} 
+    containerStyle={MAP_STYLES.HOVER_CONTAINER} 
+    edgeStyle={MAP_STYLES.HOVER_PATH_EDGE}
+    nodeStyle={MAP_STYLES.HOVER_PATH_NODE}
+    />
